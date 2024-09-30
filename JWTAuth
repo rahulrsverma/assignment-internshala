@@ -1,0 +1,62 @@
+import React, { useState } from 'react';
+
+function LoginPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = async () => {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const result = await response.json();
+    if (result.token) {
+      localStorage.setItem('token', result.token);  // Save the JWT token
+    }
+  };
+
+  return (
+    <div>
+      <h2>Login</h2>
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <button onClick={handleLogin}>Login</button>
+    </div>
+  );
+}
+
+export default LoginPage;
+
+
+
+
+
+If using authentication on backend
+
+
+const jwt = require('jsonwebtoken');
+
+// Mock login route
+app.post('/api/login', (req, res) => {
+  const { email, password } = req.body;
+
+  // Check credentials (this is just an example, you'd query the database)
+  if (email === 'user@example.com' && password === 'password123') {
+    const token = jwt.sign({ email }, 'your_secret_key', { expiresIn: '1h' });
+    return res.json({ token });
+  }
+
+  res.status(401).json({ message: 'Invalid credentials' });
+});
